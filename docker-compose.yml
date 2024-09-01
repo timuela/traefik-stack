@@ -256,7 +256,7 @@ services:
     container_name: node-exporter
     image: prom/node-exporter:latest
     ports:
-      - "8095:9100"
+      - "8097:9100"
     volumes:
       - /proc:/host/proc:ro
       - /sys:/host/sys:ro
@@ -269,4 +269,3 @@ services:
     restart: unless-stopped
     networks:
       - interconnection
-#test pipeline 2
