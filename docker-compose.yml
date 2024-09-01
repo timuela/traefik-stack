@@ -1,6 +1,6 @@
 networks:
-  traefik:
-    name: traefik
+  interconnection:
+    name: interconnection-network
     driver: bridge
 services:
   traefik-reverse-proxy:
@@ -21,7 +21,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     restart: unless-stopped
     networks:
-      - traefik
+      - interconnection
   qbittorrent:
     container_name: qbittorrent
     image: lscr.io/linuxserver/qbittorrent:latest
@@ -38,7 +38,7 @@ services:
       - ${HOME_CONFIGS_DIR}/qBittorrent:/config
       - ${DATA_DIR}/qBittorrentDownloads:/downloads
     networks:
-      - traefik
+      - interconnection
   sonarr:
     container_name: sonarr
     image: lscr.io/linuxserver/sonarr:latest
@@ -54,7 +54,7 @@ services:
       - ${DATA_DIR}/TVSeries:/tv
       - ${DATA_DIR}/qBittorrentDownloads:/downloads
     networks:
-      - traefik
+      - interconnection
   radarr:
     container_name: radarr
     image: lscr.io/linuxserver/radarr:latest
@@ -70,7 +70,7 @@ services:
       - ${DATA_DIR}/Movies:/movies
       - ${DATA_DIR}/qBittorrentDownloads:/downloads
     networks:
-      - traefik
+      - interconnection
   overseerr:
     container_name: overseerr
     image: sctx/overseerr
@@ -86,7 +86,7 @@ services:
       - 1.1.1.1
       - 1.0.0.1
     networks:
-      - traefik
+      - interconnection
   plex:
     container_name: plex
     image: plexinc/pms-docker
@@ -111,7 +111,7 @@ services:
       - ${DATA_DIR}/Movies:/movies
       - ${DATA_DIR}/TVSeries:/tvseries
     networks:
-      - traefik
+      - interconnection
   jackett:
     container_name: jackett
     image: lscr.io/linuxserver/jackett:latest
@@ -126,7 +126,7 @@ services:
       - ${HOME_CONFIGS_DIR}/jackett:/config
       - ${HOME_CONFIGS_DIR}/jackett/blackhole:/downloads
     networks:
-      - traefik
+      - interconnection
   jellyfin:
     container_name: jellyfin
     image: lscr.io/linuxserver/jellyfin:latest
@@ -142,7 +142,7 @@ services:
       - ${DATA_DIR}/TVSeries:/data/tvshows
       - ${DATA_DIR}/Movies:/data/movies
     networks:
-      - traefik
+      - interconnection
   flaresolverr:
     container_name: flaresolverr
     image: ghcr.io/flaresolverr/flaresolverr:latest
@@ -155,7 +155,7 @@ services:
       - "8087:8191"
     restart: unless-stopped
     networks:
-      - traefik
+      - interconnection
   portainer:
     container_name: portainer
     image: portainer/portainer-ce:2.20.1
@@ -167,7 +167,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     restart: unless-stopped
     networks:
-      - traefik
+      - interconnection
   bazarr:
     container_name: bazarr
     image: lscr.io/linuxserver/bazarr:latest
@@ -183,7 +183,7 @@ services:
       - 8089:6767
     restart: unless-stopped
     networks:
-      - traefik
+      - interconnection
   # Grafana Stack
   grafana-pdc-agent:
     container_name: grafana-pdc-agent
@@ -192,7 +192,7 @@ services:
       -token ${PDC_AGENT_TOKEN} -cluster ${PDC_AGENT_CLUSTER} -gcloud-hosted-grafana-id ${PDC_AGENT_GRAFANA_ID}
     restart: unless-stopped
     networks:
-      - traefik
+      - interconnection
   grafana:
     container_name: grafana
     image: grafana/grafana-enterprise
@@ -210,7 +210,7 @@ services:
       - ${HOME_CONFIGS_DIR}/grafana/provisioning:/etc/grafana/provisioning
     restart: unless-stopped
     networks:
-      - traefik
+      - interconnection
   prometheus:
     container_name: prometheus
     image: prom/prometheus
@@ -228,7 +228,7 @@ services:
       - ${HOME_CONFIGS_DIR}/prometheus/data:/prometheus
     restart: unless-stopped
     networks:
-      - traefik
+      - interconnection
   loki:
     container_name: loki
     image: grafana/loki:2.9.4
@@ -239,7 +239,7 @@ services:
       - ${HOME_CONFIGS_DIR}/loki:/etc/loki
     restart: unless-stopped
     networks:
-      - traefik
+      - interconnection
   promtail:
     container_name: promtail
     image: grafana/promtail:2.9.4
@@ -250,7 +250,7 @@ services:
       - ${HOME_CONFIGS_DIR}/promtail:/etc/promtail
     restart: unless-stopped
     networks:
-      - traefik
+      - interconnection
   node-exporter:
     container_name: node-exporter
     image: prom/node-exporter:latest
@@ -267,4 +267,4 @@ services:
       - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
     restart: unless-stopped
     networks:
-      - traefik
+      - interconnection
