@@ -154,7 +154,7 @@ services:
       - CAPTCHA_SOLVER=${CAPTCHA_SOLVER:-none}
       - TZ=${TZ}
     ports:
-      - "8087:8191"
+      - "8191:8191"
     restart: unless-stopped
     networks:
       - interconnection
