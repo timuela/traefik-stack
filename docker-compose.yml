@@ -146,14 +146,15 @@ services:
       - interconnection
   flaresolverr:
     container_name: flaresolverr
-    image: ghcr.io/flaresolverr/flaresolverr:latest
+    # image: ghcr.io/flaresolverr/flaresolverr:latest
+    image: alexfozor/flaresolverr:pr-1300-experimental
     environment:
       - LOG_LEVEL=${LOG_LEVEL:-debug}
       - LOG_HTML=${LOG_HTML:-false}
       - CAPTCHA_SOLVER=${CAPTCHA_SOLVER:-none}
       - TZ=${TZ}
     ports:
-      - "8191:8191"
+      - "8087:8191"
     restart: unless-stopped
     networks:
       - interconnection
