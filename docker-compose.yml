@@ -6,7 +6,7 @@ networks:
 services:
   traefik-reverse-proxy:
     container_name: traefik
-    image: traefik:v2.11
+    image: traefik:latest
     environment:
       - PUID=1000
       - PGID=1000
