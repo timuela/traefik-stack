@@ -208,8 +208,8 @@ services:
     ports:
       - 8092:3000
     volumes:
-      - ${HOME_CONFIGS_DIR}/grafana/etc/grafana:/etc/grafana
       - ${HOME_CONFIGS_DIR}/grafana:/var/lib/grafana
+      - ${HOME_CONFIGS_DIR}/grafana/provisioning:/etc/grafana/provisioning
     restart: unless-stopped
     networks:
       - interconnection
