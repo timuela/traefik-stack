@@ -284,4 +284,3 @@ services:
       - ${HOME_CONFIGS_DIR}/filebrowser/database/filebrowser.db:/database/filebrowser.db
       - ${DATA_DIR}:/srv
     restart: unless-stopped
-
