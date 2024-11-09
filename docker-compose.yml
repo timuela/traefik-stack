@@ -278,7 +278,7 @@ services:
       - PGID=1000
       - TZ=${TZ}
     ports:
-      - "8080:80"
+      - "8098:80"
     volumes:
       - ${HOME_CONFIGS_DIR}/filebrowser/config/settings.json:/settings.json
       - ${HOME_CONFIGS_DIR}/filebrowser/database/filebrowser.db:/filebrowser.db
