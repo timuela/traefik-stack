@@ -280,7 +280,8 @@ services:
     ports:
       - "8098:80"
     volumes:
-      - ${HOME_CONFIGS_DIR}/filebrowser/config/settings.json:/settings.json
-      - ${HOME_CONFIGS_DIR}/filebrowser/database/filebrowser.db:/filebrowser.db
+      - ${HOME_CONFIGS_DIR}/filebrowser/config/settings.json:/config/settings.json
+      - ${HOME_CONFIGS_DIR}/filebrowser/database/filebrowser.db:/database/filebrowser.db
       - ${DATA_DIR}:/srv
     restart: unless-stopped
+
