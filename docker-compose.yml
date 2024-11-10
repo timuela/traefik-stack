@@ -289,13 +289,19 @@ services:
   dashy:
     container_name: dashy
     image: lissy93/dashy
-    # volumes:
-    # - ${HOME_CONFIGS_DIR}/dashy:/app/user-data
+    volumes:
+    - ${HOME_CONFIGS_DIR}/dashy:/app/user-data
     ports:
       - "8099:8080"
     environment:
       - UID=1000
       - GID=1000
+    healthcheck:
+      test: ['CMD', 'node', '/app/services/healthcheck']
+      interval: 1m30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
     restart: unless-stopped
     networks:
       - interconnection
