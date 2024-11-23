@@ -286,13 +286,14 @@ services:
     restart: unless-stopped
     networks:
       - interconnection
+# Port 8096 is used by jenkins
   dashy:
     container_name: dashy
     image: lissy93/dashy
     volumes:
     - ${HOME_CONFIGS_DIR}/dashy:/app/user-data
     ports:
-      - 8096:8080
+      - 8097:8080
     environment:
       - UID=1000
       - GID=1000
@@ -317,7 +318,7 @@ services:
       - ${HOME_CONFIGS_DIR}/lidarr/music:/music
       - ${HOME_CONFIGS_DIR}/lidarr/downloads:/downloads
     ports:
-      - 8097:8686
+      - 8098:8686
     restart: unless-stopped
     networks:
       - interconnection
