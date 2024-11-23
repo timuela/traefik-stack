@@ -195,10 +195,9 @@ services:
     ports:
       - 12345:12345
     restart: unless-stopped
-    command: 
-      - --server.http.listen-addr=0.0.0.0:12345
-      - --storage.path=/var/lib/alloy/data /etc/alloy/config.alloy
-      # - GCLOUD_FM_URL="${GCLOUD_FM_URL}" GCLOUD_FM_POLL_FREQUENCY="${GCLOUD_FM_POLL_FREQUENCY}" GCLOUD_FM_HOSTED_ID="${GCLOUD_FM_HOSTED_ID}" ARCH="${ARCH}" GCLOUD_RW_API_KEY="${GCLOUD_RW_API_KEY}" /bin/sh -c "$(curl -fsSL https://storage.googleapis.com/cloud-onboarding/alloy/scripts/install-linux.sh)"
+    command: >
+      -server.http.listen-addr=0.0.0.0:12345 -storage.path=/var/lib/alloy/data /etc/alloy/config.alloy
+    # - GCLOUD_FM_URL="${GCLOUD_FM_URL}" GCLOUD_FM_POLL_FREQUENCY="${GCLOUD_FM_POLL_FREQUENCY}" GCLOUD_FM_HOSTED_ID="${GCLOUD_FM_HOSTED_ID}" ARCH="${ARCH}" GCLOUD_RW_API_KEY="${GCLOUD_RW_API_KEY}" /bin/sh -c "$(curl -fsSL https://storage.googleapis.com/cloud-onboarding/alloy/scripts/install-linux.sh)"
     networks:
       - interconnection
   grafana-pdc-agent:
@@ -300,19 +299,19 @@ services:
     restart: unless-stopped
     networks:
       - interconnection
-# Port 8096 is used by jenkins
+  # Port 8096 is used by jenkins
   dashy:
     container_name: dashy
     image: lissy93/dashy
     volumes:
-    - ${HOME_CONFIGS_DIR}/dashy:/app/user-data
+      - ${HOME_CONFIGS_DIR}/dashy:/app/user-data
     ports:
       - 8097:8080
     environment:
       - UID=1000
       - GID=1000
     healthcheck:
-      test: ['CMD', 'node', '/app/services/healthcheck']
+      test: [ 'CMD', 'node', '/app/services/healthcheck' ]
       interval: 1m30s
       timeout: 10s
       retries: 3
