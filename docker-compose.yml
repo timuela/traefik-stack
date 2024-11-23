@@ -227,7 +227,7 @@ services:
       - --storage.tsdb.retention.time=7d
     volumes:
       - ${HOME_CONFIGS_DIR}/prometheus:/etc/prometheus
-      # - ${DATA_DIR}/prometheus/data:/prometheus
+      - ${HOME_DATA_DIR}/prometheus/data:/prometheus
     restart: unless-stopped
     networks:
       - interconnection
