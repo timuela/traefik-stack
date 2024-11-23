@@ -4,25 +4,6 @@ networks:
     name: interconnection-network
     driver: bridge
 services:
-  traefik-reverse-proxy:
-    container_name: traefik
-    image: traefik:latest
-    environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=${TZ}
-    ports:
-      - "80:80"
-      - "443:443"
-      - "8091:8080"
-    volumes:
-      - ${HOME_CONFIGS_DIR}/traefik/letsencrypt:/letsencrypt
-      - ${HOME_CONFIGS_DIR}/traefik/configs:/etc/traefik
-      - /var/log/traefik:/var/log/traefik
-      - /var/run/docker.sock:/var/run/docker.sock
-    restart: unless-stopped
-    networks:
-      - interconnection
   qbittorrent:
     container_name: qbittorrent
     image: lscr.io/linuxserver/qbittorrent:latest
@@ -44,7 +25,7 @@ services:
     container_name: sonarr
     image: lscr.io/linuxserver/sonarr:latest
     ports:
-      - '8081:8989'
+      - 8081:8989
     restart: unless-stopped
     environment:
       - PUID=1000
@@ -60,7 +41,7 @@ services:
     container_name: radarr
     image: lscr.io/linuxserver/radarr:latest
     ports:
-      - '8082:7878'
+      - 8082:7878
     restart: unless-stopped
     environment:
       - PUID=1000
@@ -76,7 +57,7 @@ services:
     container_name: overseerr
     image: sctx/overseerr
     ports:
-      - '8083:5055'
+      - 8083:5055
     restart: unless-stopped
     environment:
       - LOG-LEVEL=debug
@@ -117,7 +98,7 @@ services:
     container_name: jackett
     image: lscr.io/linuxserver/jackett:latest
     ports:
-      - '8085:9117'
+      - 8085:9117
     restart: unless-stopped
     environment:
       - PUID=1000
@@ -154,7 +135,7 @@ services:
       - CAPTCHA_SOLVER=${CAPTCHA_SOLVER:-none}
       - TZ=${TZ}
     ports:
-      - "8191:8191"
+      - 8087:8191
     restart: unless-stopped
     networks:
       - interconnection
@@ -186,6 +167,25 @@ services:
     restart: unless-stopped
     networks:
       - interconnection
+  traefik-reverse-proxy:
+    container_name: traefik
+    image: traefik:latest
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=${TZ}
+    ports:
+      - 80:80
+      - 443:443
+      - 8090:8080
+    volumes:
+      - ${HOME_CONFIGS_DIR}/traefik/letsencrypt:/letsencrypt
+      - ${HOME_CONFIGS_DIR}/traefik/configs:/etc/traefik
+      - /var/log/traefik:/var/log/traefik
+      - /var/run/docker.sock:/var/run/docker.sock
+    restart: unless-stopped
+    networks:
+      - interconnection
   # Grafana Stack
   grafana-pdc-agent:
     container_name: grafana-pdc-agent
@@ -206,7 +206,7 @@ services:
       - GF_INSTALL_PLUGINS=grafana-clock-panel
       - GF_PATHS_PROVISIONING=/etc/grafana/provisioning
     ports:
-      - 8092:3000
+      - 8091:3000
     volumes:
       - ${HOME_CONFIGS_DIR}/grafana:/var/lib/grafana
       - ${HOME_CONFIGS_DIR}/grafana/provisioning:/etc/grafana/provisioning
@@ -218,7 +218,7 @@ services:
     image: prom/prometheus
     user: root
     ports:
-      - 8093:9090
+      - 8092:9090
     command:
       - --config.file=/etc/prometheus/prometheus.yml
       - --storage.tsdb.path=/prometheus
@@ -235,7 +235,7 @@ services:
     container_name: loki
     image: grafana/loki:2.9.4
     ports:
-      - "8094:3100"
+      - 8093:3100
     command: -config.file=/etc/loki/loki-config.yml
     volumes:
       - ${HOME_CONFIGS_DIR}/loki:/etc/loki
@@ -257,7 +257,7 @@ services:
     container_name: node-exporter
     image: prom/node-exporter:latest
     ports:
-      - "8097:9100"
+      - 8094:9100
     volumes:
       - /proc:/host/proc:ro
       - /sys:/host/sys:ro
@@ -278,7 +278,7 @@ services:
       - PGID=1000
       - TZ=${TZ}
     ports:
-      - "8098:80"
+      - 8095:80
     volumes:
       - ${HOME_CONFIGS_DIR}/filebrowser/config/settings.json:/config/settings.json
       - ${HOME_CONFIGS_DIR}/filebrowser/database/filebrowser.db:/database/filebrowser.db
@@ -292,7 +292,7 @@ services:
     volumes:
     - ${HOME_CONFIGS_DIR}/dashy:/app/user-data
     ports:
-      - "8099:8080"
+      - 8096:8080
     environment:
       - UID=1000
       - GID=1000
@@ -302,6 +302,22 @@ services:
       timeout: 10s
       retries: 3
       start_period: 40s
+    restart: unless-stopped
+    networks:
+      - interconnection
+  lidarr:
+    image: lscr.io/linuxserver/lidarr:latest
+    container_name: lidarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=${TZ}
+    volumes:
+      - ${HOME_CONFIGS_DIR}/lidarr/config:/config
+      - ${HOME_CONFIGS_DIR}/lidarr/music:/music
+      - ${HOME_CONFIGS_DIR}/lidarr/downloads:/downloads
+    ports:
+      - 8097:8686
     restart: unless-stopped
     networks:
       - interconnection
