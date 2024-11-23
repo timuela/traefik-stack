@@ -245,7 +245,7 @@ services:
       - interconnection
   promtail:
     container_name: promtail
-    image: grafana/promtail:2.9.4
+    image: grafana/promtail:latest
     command: -config.file=/etc/promtail/promtail-config.yml
     user: root
     volumes:
