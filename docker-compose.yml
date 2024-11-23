@@ -198,7 +198,7 @@ services:
     command: [
       "run",
       "--server.http.listen-addr=0.0.0.0:12345",
-      "-storage.path=/var/lib/alloy/data",
+      "--storage.path=/var/lib/alloy/data",
       "/etc/alloy/config.alloy",
     ]
     # - GCLOUD_FM_URL="${GCLOUD_FM_URL}" GCLOUD_FM_POLL_FREQUENCY="${GCLOUD_FM_POLL_FREQUENCY}" GCLOUD_FM_HOSTED_ID="${GCLOUD_FM_HOSTED_ID}" ARCH="${ARCH}" GCLOUD_RW_API_KEY="${GCLOUD_RW_API_KEY}" /bin/sh -c "$(curl -fsSL https://storage.googleapis.com/cloud-onboarding/alloy/scripts/install-linux.sh)"
