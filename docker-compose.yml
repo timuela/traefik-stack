@@ -233,7 +233,7 @@ services:
       - interconnection
   loki:
     container_name: loki
-    image: grafana/loki:2.9.4
+    image: grafana/loki:latest
     user: root
     ports:
       - 8093:3100
