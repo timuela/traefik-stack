@@ -187,6 +187,17 @@ services:
     networks:
       - interconnection
   # Grafana Stack
+  grafana-alloy:
+    container_name: grafana-alloy
+    image: grafana/alloy:latest
+    environment:
+      - ${HOME_CONFIGS_DIR}/alloy:/etc/alloy/config.alloy
+    ports:
+      - 12345:12345
+    restart: unless-stopped
+    command: 'run --server.http.listen-addr=0.0.0.0:12345 --storage.path=/var/lib/alloy/data /etc/alloy/config.alloy'
+    networks:
+      - interconnection
   grafana-pdc-agent:
     container_name: grafana-pdc-agent
     image: grafana/pdc-agent:latest
