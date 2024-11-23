@@ -239,7 +239,6 @@ services:
       - 8093:3100
     command: -config.file=/etc/loki/loki-config.yml
     volumes:
-      - ${HOME_DATA_DIR}/loki/data:/loki/data
       - ${HOME_CONFIGS_DIR}/loki:/etc/loki
     restart: unless-stopped
     networks:
