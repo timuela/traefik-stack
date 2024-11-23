@@ -234,10 +234,7 @@ services:
   loki:
     container_name: loki
     image: grafana/loki:2.9.4
-    environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=${TZ}
+    user: root
     ports:
       - 8093:3100
     command: -config.file=/etc/loki/loki-config.yml
