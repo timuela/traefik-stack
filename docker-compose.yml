@@ -53,20 +53,33 @@ services:
       - ${DATA_DIR}/qBittorrentDownloads:/downloads
     networks:
       - interconnection
-  overseerr:
-    container_name: overseerr
-    image: sctx/overseerr
+  # overseerr:
+  #   container_name: overseerr
+  #   image: sctx/overseerr
+  #   ports:
+  #     - 8083:5055
+  #   restart: unless-stopped
+  #   environment:
+  #     - LOG-LEVEL=debug
+  #     - TZ=${TZ}
+  #   volumes:
+  #     - ${HOME_CONFIGS_DIR}/overseerr:/app/config
+  #   dns:
+  #     - 1.1.1.1
+  #     - 1.0.0.1
+  #   networks:
+  #     - interconnection
+  jellyseerr:
+    image: fallenbagel/jellyseerr:latest
+    container_name: jellyseerr
+    environment:
+      - LOG_LEVEL=debug
+      - TZ=${TZ}
     ports:
       - 8083:5055
-    restart: unless-stopped
-    environment:
-      - LOG-LEVEL=debug
-      - TZ=${TZ}
     volumes:
-      - ${HOME_CONFIGS_DIR}/overseerr:/app/config
-    dns:
-      - 1.1.1.1
-      - 1.0.0.1
+      - ${HOME_CONFIGS_DIR}/jellyseerr:/app/config
+    restart: unless-stopped
     networks:
       - interconnection
   plex:
