@@ -52,22 +52,6 @@ services:
       - ${DATA_DIR}/qBittorrentDownloads:/downloads
     networks:
       - interconnection
-  # overseerr:
-  #   container_name: overseerr
-  #   image: sctx/overseerr
-  #   ports:
-  #     - 8083:5055
-  #   restart: unless-stopped
-  #   environment:
-  #     - LOG-LEVEL=debug
-  #     - TZ=${TZ}
-  #   volumes:
-  #     - ${HOME_CONFIGS_DIR}/overseerr:/app/config
-  #   dns:
-  #     - 1.1.1.1
-  #     - 1.0.0.1
-  #   networks:
-  #     - interconnection
   jellyseerr:
     image: fallenbagel/jellyseerr:latest
     container_name: jellyseerr
@@ -81,31 +65,6 @@ services:
     restart: unless-stopped
     networks:
       - interconnection
-  # plex:
-  #   container_name: plex
-  #   image: plexinc/pms-docker
-  #   ports:
-  #     - 8084:32400/tcp
-  #     - 8324:8324/tcp
-  #     - 32469:32469/tcp
-  #     - 1900:1900/udp
-  #     - 32410:32410/udp
-  #     - 32412:32412/udp
-  #     - 32413:32413/udp
-  #     - 32414:32414/udp
-  #   restart: unless-stopped
-  #   environment:
-  #     - TZ=${TZ}
-  #     - PLEX_CLAIM=${PLEX_CLAIM}
-  #     - ADVERTISE_IP=https://plex.${DOMAIN_MAIN}:443
-  #   hostname: RavenZ
-  #   volumes:
-  #     - ${HOME_CONFIGS_DIR}/plex:/config
-  #     - ${HOME_CONFIGS_DIR}/plex/transcode:/transcode
-  #     - ${DATA_DIR}/Movies:/movies
-  #     - ${DATA_DIR}/TVSeries:/tvseries
-  #   networks:
-  #     - interconnection
   jackett:
     container_name: jackett
     image: lscr.io/linuxserver/jackett:latest
@@ -198,90 +157,91 @@ services:
     networks:
       - interconnection
   # Grafana Stack
-  grafana-pdc-agent:
-    container_name: grafana-pdc-agent
-    image: grafana/pdc-agent:latest
-    command: >
-      -token ${PDC_AGENT_TOKEN} -cluster ${PDC_AGENT_CLUSTER} -gcloud-hosted-grafana-id ${PDC_AGENT_GRAFANA_ID}
-    restart: unless-stopped
-    networks:
-      - interconnection
-  grafana:
-    container_name: grafana
-    image: grafana/grafana-enterprise
-    user: "1000"
-    environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=${TZ}
-      - GF_INSTALL_PLUGINS=grafana-clock-panel
-      - GF_PATHS_PROVISIONING=/etc/grafana/provisioning
-    ports:
-      - 8091:3000
-    volumes:
-      - ${HOME_CONFIGS_DIR}/grafana:/var/lib/grafana
-      - ${HOME_CONFIGS_DIR}/grafana/provisioning:/etc/grafana/provisioning
-    restart: unless-stopped
-    networks:
-      - interconnection
-  prometheus:
-    container_name: prometheus
-    image: prom/prometheus
-    user: root
-    ports:
-      - 8092:9090
-    command:
-      - --config.file=/etc/prometheus/prometheus.yml
-      - --storage.tsdb.path=/prometheus
-      - --web.console.libraries=/usr/share/prometheus/console_libraries
-      - --web.console.templates=/usr/share/prometheus/consoles
-      - --storage.tsdb.retention.time=7d
-    volumes:
-      - ${HOME_CONFIGS_DIR}/prometheus:/etc/prometheus
-      - ${HOME_DATA_DIR}/prometheus/data:/prometheus
-    restart: unless-stopped
-    networks:
-      - interconnection
-  loki:
-    container_name: loki
-    image: grafana/loki:latest
-    user: root
-    ports:
-      - 8093:3100
-    command: -config.file=/etc/loki/loki-config.yml
-    volumes:
-      - ${HOME_CONFIGS_DIR}/loki:/etc/loki
-    restart: unless-stopped
-    networks:
-      - interconnection
-  promtail:
-    container_name: promtail
-    image: grafana/promtail:latest
-    command: -config.file=/etc/promtail/promtail-config.yml
-    user: root
-    volumes:
-      - /var/log:/var/log
-      - ${HOME_CONFIGS_DIR}/promtail:/etc/promtail
-    restart: unless-stopped
-    networks:
-      - interconnection
-  node-exporter:
-    container_name: node-exporter
-    image: prom/node-exporter:latest
-    ports:
-      - 8094:9100
-    volumes:
-      - /proc:/host/proc:ro
-      - /sys:/host/sys:ro
-      - /:/rootfs:ro
-    command:
-      - '--path.procfs=/host/proc'
-      - '--path.rootfs=/rootfs'
-      - '--path.sysfs=/host/sys'
-      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
-    restart: unless-stopped
-    networks:
-      - interconnection
+  # grafana-pdc-agent:
+  #   container_name: grafana-pdc-agent
+  #   image: grafana/pdc-agent:latest
+  #   command: >
+  #     -token ${PDC_AGENT_TOKEN} -cluster ${PDC_AGENT_CLUSTER} -gcloud-hosted-grafana-id ${PDC_AGENT_GRAFANA_ID}
+  #   restart: unless-stopped
+  #   networks:
+  #     - interconnection
+  # grafana:
+  #   container_name: grafana
+  #   image: grafana/grafana-enterprise
+  #   user: "1000"
+  #   environment:
+  #     - PUID=1000
+  #     - PGID=1000
+  #     - TZ=${TZ}
+  #     - GF_INSTALL_PLUGINS=grafana-clock-panel
+  #     - GF_PATHS_PROVISIONING=/etc/grafana/provisioning
+  #   ports:
+  #     - 8091:3000
+  #   volumes:
+  #     - ${HOME_CONFIGS_DIR}/grafana:/var/lib/grafana
+  #     - ${HOME_CONFIGS_DIR}/grafana/provisioning:/etc/grafana/provisioning
+  #   restart: unless-stopped
+  #   networks:
+  #     - interconnection
+  # prometheus:
+  #   container_name: prometheus
+  #   image: prom/prometheus
+  #   user: root
+  #   ports:
+  #     - 8092:9090
+  #   command:
+  #     - --config.file=/etc/prometheus/prometheus.yml
+  #     - --storage.tsdb.path=/prometheus
+  #     - --web.console.libraries=/usr/share/prometheus/console_libraries
+  #     - --web.console.templates=/usr/share/prometheus/consoles
+  #     - --storage.tsdb.retention.time=7d
+  #   volumes:
+  #     - ${HOME_CONFIGS_DIR}/prometheus:/etc/prometheus
+  #     - ${HOME_DATA_DIR}/prometheus/data:/prometheus
+  #   restart: unless-stopped
+  #   networks:
+  #     - interconnection
+  # loki:
+  #   container_name: loki
+  #   image: grafana/loki:latest
+  #   user: root
+  #   ports:
+  #     - 8093:3100
+  #   command: -config.file=/etc/loki/loki-config.yml
+  #   volumes:
+  #     - ${HOME_CONFIGS_DIR}/loki:/etc/loki
+  #   restart: unless-stopped
+  #   networks:
+  #     - interconnection
+  # promtail:
+  #   container_name: promtail
+  #   image: grafana/promtail:latest
+  #   command: -config.file=/etc/promtail/promtail-config.yml
+  #   user: root
+  #   volumes:
+  #     - /var/log:/var/log
+  #     - ${HOME_CONFIGS_DIR}/promtail:/etc/promtail
+  #   restart: unless-stopped
+  #   networks:
+  #     - interconnection
+  # node-exporter:
+  #   container_name: node-exporter
+  #   image: prom/node-exporter:latest
+  #   ports:
+  #     - 8094:9100
+  #   volumes:
+  #     - /proc:/host/proc:ro
+  #     - /sys:/host/sys:ro
+  #     - /:/rootfs:ro
+  #   command:
+  #     - '--path.procfs=/host/proc'
+  #     - '--path.rootfs=/rootfs'
+  #     - '--path.sysfs=/host/sys'
+  #     - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
+  #   restart: unless-stopped
+  #   networks:
+  #     - interconnection
+
   filebrowser:
     container_name: filebrowser
     image: filebrowser/filebrowser:s6
