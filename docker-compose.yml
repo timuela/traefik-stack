@@ -1,6 +1,5 @@
 networks:
   interconnection:
-    external: true
     name: interconnection-network
     driver: bridge
 services:
