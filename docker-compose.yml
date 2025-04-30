@@ -3,23 +3,7 @@ networks:
     name: interconnection-network
     driver: bridge
 services:
-  qbittorrent:
-    container_name: qbittorrent
-    image: lscr.io/linuxserver/qbittorrent:latest
-    ports:
-      - 8080:8080
-      - 6881:6881
-      - 6881:6881/udp
-    restart: unless-stopped
-    environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=${TZ}
-    volumes:
-      - ${HOME_CONFIGS_DIR}/qBittorrent:/config
-      - ${DATA_DIR}/qBittorrentDownloads:/downloads
-    networks:
-      - interconnection
+#Sonarr
   sonarr:
     container_name: sonarr
     image: lscr.io/linuxserver/sonarr:latest
@@ -36,6 +20,7 @@ services:
       - ${DATA_DIR}/qBittorrentDownloads:/downloads
     networks:
       - interconnection
+#Radarr
   radarr:
     container_name: radarr
     image: lscr.io/linuxserver/radarr:latest
@@ -52,6 +37,7 @@ services:
       - ${DATA_DIR}/qBittorrentDownloads:/downloads
     networks:
       - interconnection
+#Jellyseerr
   jellyseerr:
     image: fallenbagel/jellyseerr:latest
     container_name: jellyseerr
@@ -65,11 +51,12 @@ services:
     restart: unless-stopped
     networks:
       - interconnection
+#Jackett
   jackett:
     container_name: jackett
     image: lscr.io/linuxserver/jackett:latest
     ports:
-      - 8085:9117
+      - 8084:9117
     restart: unless-stopped
     environment:
       - PUID=1000
@@ -80,11 +67,12 @@ services:
       - ${HOME_CONFIGS_DIR}/jackett/blackhole:/downloads
     networks:
       - interconnection
+#Jellyfin
   jellyfin:
     container_name: jellyfin
     image: lscr.io/linuxserver/jellyfin:latest
     ports:
-      - 8086:8096
+      - 8085:8096
     restart: unless-stopped
     environment:
       - PUID=1000
@@ -96,6 +84,7 @@ services:
       - ${DATA_DIR}/Movies:/data/movies
     networks:
       - interconnection
+#Flaresolverr
   flaresolverr:
     container_name: flaresolverr
     image: alexfozor/flaresolverr:pr-1300-experimental
@@ -105,22 +94,24 @@ services:
       - CAPTCHA_SOLVER=${CAPTCHA_SOLVER:-none}
       - TZ=${TZ}
     ports:
-      - 8087:8191
+      - 8086:8191
     restart: unless-stopped
     networks:
       - interconnection
+#Portainer
   portainer:
     container_name: portainer
     image: portainer/portainer-ce:2.20.1
     ports:
       - 8000:8000
-      - 8088:9000
+      - 8087:9000
     volumes:
       - ${HOME_CONFIGS_DIR}/portainer/data:/data
       - /var/run/docker.sock:/var/run/docker.sock
     restart: unless-stopped
     networks:
       - interconnection
+#Bazarr
   bazarr:
     container_name: bazarr
     image: lscr.io/linuxserver/bazarr:latest
@@ -133,151 +124,11 @@ services:
       - ${DATA_DIR}/Movies:/movies
       - ${DATA_DIR}/TVSeries:/tv
     ports:
-      - 8089:6767
+      - 8088:6767
     restart: unless-stopped
     networks:
       - interconnection
-  traefik-reverse-proxy:
-    container_name: traefik
-    image: traefik:latest
-    environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=${TZ}
-    ports:
-      - 80:80
-      - 443:443
-      - 8090:8080
-    volumes:
-      - ${HOME_CONFIGS_DIR}/traefik/letsencrypt:/letsencrypt
-      - ${HOME_CONFIGS_DIR}/traefik/configs:/etc/traefik
-      - /var/log/traefik:/var/log/traefik
-      - /var/run/docker.sock:/var/run/docker.sock
-    restart: unless-stopped
-    networks:
-      - interconnection
-  # Grafana Stack
-  # grafana-pdc-agent:
-  #   container_name: grafana-pdc-agent
-  #   image: grafana/pdc-agent:latest
-  #   command: >
-  #     -token ${PDC_AGENT_TOKEN} -cluster ${PDC_AGENT_CLUSTER} -gcloud-hosted-grafana-id ${PDC_AGENT_GRAFANA_ID}
-  #   restart: unless-stopped
-  #   networks:
-  #     - interconnection
-  # grafana:
-  #   container_name: grafana
-  #   image: grafana/grafana-enterprise
-  #   user: "1000"
-  #   environment:
-  #     - PUID=1000
-  #     - PGID=1000
-  #     - TZ=${TZ}
-  #     - GF_INSTALL_PLUGINS=grafana-clock-panel
-  #     - GF_PATHS_PROVISIONING=/etc/grafana/provisioning
-  #   ports:
-  #     - 8091:3000
-  #   volumes:
-  #     - ${HOME_CONFIGS_DIR}/grafana:/var/lib/grafana
-  #     - ${HOME_CONFIGS_DIR}/grafana/provisioning:/etc/grafana/provisioning
-  #   restart: unless-stopped
-  #   networks:
-  #     - interconnection
-  # prometheus:
-  #   container_name: prometheus
-  #   image: prom/prometheus
-  #   user: root
-  #   ports:
-  #     - 8092:9090
-  #   command:
-  #     - --config.file=/etc/prometheus/prometheus.yml
-  #     - --storage.tsdb.path=/prometheus
-  #     - --web.console.libraries=/usr/share/prometheus/console_libraries
-  #     - --web.console.templates=/usr/share/prometheus/consoles
-  #     - --storage.tsdb.retention.time=7d
-  #   volumes:
-  #     - ${HOME_CONFIGS_DIR}/prometheus:/etc/prometheus
-  #     - ${HOME_DATA_DIR}/prometheus/data:/prometheus
-  #   restart: unless-stopped
-  #   networks:
-  #     - interconnection
-  # loki:
-  #   container_name: loki
-  #   image: grafana/loki:latest
-  #   user: root
-  #   ports:
-  #     - 8093:3100
-  #   command: -config.file=/etc/loki/loki-config.yml
-  #   volumes:
-  #     - ${HOME_CONFIGS_DIR}/loki:/etc/loki
-  #   restart: unless-stopped
-  #   networks:
-  #     - interconnection
-  # promtail:
-  #   container_name: promtail
-  #   image: grafana/promtail:latest
-  #   command: -config.file=/etc/promtail/promtail-config.yml
-  #   user: root
-  #   volumes:
-  #     - /var/log:/var/log
-  #     - ${HOME_CONFIGS_DIR}/promtail:/etc/promtail
-  #   restart: unless-stopped
-  #   networks:
-  #     - interconnection
-  # node-exporter:
-  #   container_name: node-exporter
-  #   image: prom/node-exporter:latest
-  #   ports:
-  #     - 8094:9100
-  #   volumes:
-  #     - /proc:/host/proc:ro
-  #     - /sys:/host/sys:ro
-  #     - /:/rootfs:ro
-  #   command:
-  #     - '--path.procfs=/host/proc'
-  #     - '--path.rootfs=/rootfs'
-  #     - '--path.sysfs=/host/sys'
-  #     - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
-  #   restart: unless-stopped
-  #   networks:
-  #     - interconnection
- #End Grafana
-  filebrowser:
-    container_name: filebrowser
-    image: filebrowser/filebrowser:s6
-    environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=${TZ}
-    ports:
-      - 8095:80
-    volumes:
-      - ${HOME_CONFIGS_DIR}/filebrowser/config/settings.json:/config/settings.json
-      - ${HOME_CONFIGS_DIR}/filebrowser/database/filebrowser.db:/database/filebrowser.db
-      - ${DATA_DIR}:/srv
-    restart: unless-stopped
-    networks:
-      - interconnection
-  # Port 8096 is used by jenkins
-  dashy:
-    container_name: dashy
-    image: lissy93/dashy
-    volumes:
-      - ${HOME_CONFIGS_DIR}/dashy:/app/user-data
-    ports:
-      - 8097:8080
-    environment:
-      - UID=1000
-      - GID=1000
-    healthcheck:
-      test: [ 'CMD', 'node', '/app/services/healthcheck' ]
-      interval: 1m30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
-    restart: unless-stopped
-    networks:
-      - interconnection
+#Lidarr
   lidarr:
     image: lscr.io/linuxserver/lidarr:latest
     container_name: lidarr
@@ -290,7 +141,83 @@ services:
       - ${HOME_CONFIGS_DIR}/lidarr/music:/music
       - ${HOME_CONFIGS_DIR}/lidarr/downloads:/downloads
     ports:
-      - 8098:8686
+      - 8089:8686
+    restart: unless-stopped
+    networks:
+      - interconnection
+#FileBrowser
+  filebrowser:
+    container_name: filebrowser
+    image: filebrowser/filebrowser:s6
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=${TZ}
+    ports:
+      - 8090:80
+    volumes:
+      - ${HOME_CONFIGS_DIR}/filebrowser/config/settings.json:/config/settings.json
+      - ${HOME_CONFIGS_DIR}/filebrowser/database/filebrowser.db:/database/filebrowser.db
+      - ${DATA_DIR}:/srv
+    restart: unless-stopped
+    networks:
+      - interconnection
+  # Port 8096 is being used by jenkins
+#Dashy
+  dashy:
+    container_name: dashy
+    image: lissy93/dashy
+    volumes:
+      - ${HOME_CONFIGS_DIR}/dashy:/app/user-data
+    ports:
+      - 8091:8080
+    environment:
+      - UID=1000
+      - GID=1000
+    healthcheck:
+      test: [ 'CMD', 'node', '/app/services/healthcheck' ]
+      interval: 1m30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
+    networks:
+      - interconnection
+#Qbittorent
+  qbittorrent:
+    container_name: qbittorrent
+    image: lscr.io/linuxserver/qbittorrent:latest
+    ports:
+      - 8092:8080
+      - 6881:6881
+      - 6881:6881/udp
+    restart: unless-stopped
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=${TZ}
+    volumes:
+      - ${HOME_CONFIGS_DIR}/qBittorrent:/config
+      - ${DATA_DIR}/qBittorrentDownloads:/downloads
+    networks:
+      - interconnection
+#Traefik
+  traefik-reverse-proxy:
+    container_name: traefik
+    image: traefik:latest
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=${TZ}
+    ports:
+      - 80:80
+      - 443:443
+      - 9090:8080
+    volumes:
+      - ${HOME_CONFIGS_DIR}/traefik/letsencrypt:/letsencrypt
+      - ${HOME_CONFIGS_DIR}/traefik/configs:/etc/traefik
+      - /var/log/traefik:/var/log/traefik
+      - /var/run/docker.sock:/var/run/docker.sock
     restart: unless-stopped
     networks:
       - interconnection
