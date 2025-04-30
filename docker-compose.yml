@@ -103,7 +103,7 @@ services:
     container_name: portainer
     image: portainer/portainer-ce:2.20.1
     ports:
-      - 8000:8000
+      # - 8000:8000
       - 8087:9000
     volumes:
       - ${HOME_CONFIGS_DIR}/portainer/data:/data
@@ -162,7 +162,6 @@ services:
     restart: unless-stopped
     networks:
       - interconnection
-  # Port 8096 is being used by jenkins
 #Dashy
   dashy:
     container_name: dashy
@@ -189,8 +188,8 @@ services:
     image: lscr.io/linuxserver/qbittorrent:latest
     ports:
       - 8092:8080
-      - 6881:6881
-      - 6881:6881/udp
+      # - 6881:6881
+      # - 6881:6881/udp
     restart: unless-stopped
     environment:
       - PUID=1000
@@ -201,6 +200,7 @@ services:
       - ${DATA_DIR}/qBittorrentDownloads:/downloads
     networks:
       - interconnection
+  # Port 8096 is being used by jenkins
 #Traefik
   traefik-reverse-proxy:
     container_name: traefik
@@ -212,7 +212,7 @@ services:
     ports:
       - 80:80
       - 443:443
-      - 9090:8080
+      # - 9090:8080
     volumes:
       - ${HOME_CONFIGS_DIR}/traefik/letsencrypt:/letsencrypt
       - ${HOME_CONFIGS_DIR}/traefik/configs:/etc/traefik
