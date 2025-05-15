@@ -2,6 +2,7 @@ networks:
   interconnection:
     name: interconnection-network
     driver: bridge
+    external: true
 services:
 #Sonarr
   sonarr:
