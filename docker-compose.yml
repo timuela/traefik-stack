@@ -222,3 +222,14 @@ services:
     restart: unless-stopped
     networks:
       - interconnection
+#MongoDB
+  mongodb:
+    container_name: mongodb
+    image: mongodb-community-server:latest
+    restart: unless-stopped
+    ports:
+      - 27017:27017
+    volumes:
+      - ${HOME_CONFIGS_DIR}/mongodb:/data/db
+    networks:
+      - interconnection
