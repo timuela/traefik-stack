@@ -225,7 +225,7 @@ services:
 #MongoDB
   mongodb:
     container_name: mongodb
-    image: mongodb-community-server:latest
+    image: mongo:latest
     restart: unless-stopped
     ports:
       - 27017:27017
