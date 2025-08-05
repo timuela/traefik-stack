@@ -262,7 +262,7 @@ services:
   ztncui:
     image: keynetworks/ztncui:latest
     container_name: ztncui
-    ports:
+    # ports:
       # - "9993:9993/udp" # ZeroTier Peer Discovery
       # - "3443:3443" # ZeroTier UI https
       # - "3180:3180"
