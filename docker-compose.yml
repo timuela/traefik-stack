@@ -243,6 +243,8 @@ services:
       - ${HOME_CONFIGS_DIR}/upsnap/data:/app/pb_data
     # # To use a non-root user, create the mountpoint first (mkdir data) so that it has the right permission.
     # user: 1000:1000
+    ports:
+      - 8093:8090
     environment:
       - TZ=${TZ}
     #   - UPSNAP_INTERVAL=*/10 * * * * * # Sets the interval in which the devices are pinged
