@@ -258,3 +258,17 @@ services:
       interval: 10s
     # # or install custom packages for shutdown
     # entrypoint: /bin/sh -c "apk update && apk add --no-cache <YOUR_PACKAGE> && rm -rf /var/cache/apk/* && ./upsnap serve --http 0.0.0.0:8090"
+# Self hosted ZeroTier
+  ztncui:
+    image: keynetworks/ztncui:latest
+    container_name: ztncui
+    ports:
+      - "9993:9993/udp"
+      - "3443:3443"
+      - "3180:3180"
+    volumes:
+      - ${HOME_CONFIGS_DIR}/ztncui/mydata/ztncui:/opt/key-networks/ztncui/etc
+      - ${HOME_CONFIGS_DIR}/ztncui/mydata/zt1:/var/lib/zerotier-one
+    env_file:
+      - ${HOME_CONFIGS_DIR}/ztncui/denv
+    restart: unless-stopped
