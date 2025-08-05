@@ -263,9 +263,6 @@ services:
     image: keynetworks/ztncui:latest
     container_name: ztncui
     ports:
-      - "9993:9993/udp"
-      - "3443:3443"
-      - "3180:3180"
       - "3000:3000"
     volumes:
       - ${HOME_CONFIGS_DIR}/ztncui/mydata/ztncui:/opt/key-networks/ztncui/etc
