@@ -248,9 +248,9 @@ services:
     environment:
       - TZ=${TZ}
     # dns is used for name resolution during network scan
-    dns:
-      - 192.18.0.1
-      - 192.18.0.2
+    # dns:
+    #   - 192.18.0.1
+    #   - 192.18.0.2
     # # you can change the listen ip:port inside the container like this:
     entrypoint: /bin/sh -c "./upsnap serve --http 0.0.0.0:8093"
     healthcheck:
