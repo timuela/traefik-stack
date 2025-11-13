@@ -54,7 +54,7 @@ services:
     networks:
       - interconnection
     healthcheck:
-      test: wget --no-verbose --tries=1 --spider http://192.168.10.151:8083/api/v1/status || exit 1
+      test: wget --no-verbose --tries=1 --spider http://jellyseerr:5055/api/v1/status || exit 1
       start_period: 20s
       timeout: 3s
       interval: 15s
@@ -109,10 +109,11 @@ services:
 #Portainer
   portainer:
     container_name: portainer
-    image: portainer/portainer-ce:2.20.1
+    image: portainer/portainer-ce:lts
     ports:
       # - 8000:8000
       - 8087:9000
+      #- 9443:9443
     volumes:
       - ${HOME_CONFIGS_DIR}/portainer/data:/data
       - /var/run/docker.sock:/var/run/docker.sock
@@ -190,19 +191,21 @@ services:
     restart: unless-stopped
     networks:
       - interconnection
-#Qbittorent
+#Qbittorrent
   qbittorrent:
     container_name: qbittorrent
     image: lscr.io/linuxserver/qbittorrent:latest
     ports:
-      - 8092:8080
-      # - 6881:6881
-      # - 6881:6881/udp
+      - 8092:8092
+      - 6881:6881
+      - 6881:6881/udp
     restart: unless-stopped
     environment:
       - PUID=1000
       - PGID=1000
       - TZ=${TZ}
+      - WEBUI_PORT=8092
+      - TORRENTING_PORT=6881
     volumes:
       - ${HOME_CONFIGS_DIR}/qBittorrent:/config
       - ${DATA_DIR}/qBittorrentDownloads:/downloads
