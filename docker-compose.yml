@@ -2,7 +2,6 @@ networks:
   interconnection:
     name: interconnection-network
     driver: bridge
-    external: true
 services:
 #Sonarr
   sonarr:
@@ -53,12 +52,6 @@ services:
     restart: unless-stopped
     networks:
       - interconnection
-    healthcheck:
-      test: wget --no-verbose --tries=1 --spider http://jellyseerr:5055/api/v1/status || exit 1
-      start_period: 20s
-      timeout: 3s
-      interval: 15s
-      retries: 3
 #Jackett
   jackett:
     container_name: jackett
@@ -90,6 +83,7 @@ services:
       - ${HOME_CONFIGS_DIR}/jellyfin:/config
       - ${DATA_DIR}/TVSeries:/data/tvshows
       - ${DATA_DIR}/Movies:/data/movies
+      - ${DATA_DIR}/Audios:/data/audios
     networks:
       - interconnection
 #Flaresolverr
@@ -137,40 +131,24 @@ services:
     restart: unless-stopped
     networks:
       - interconnection
-#Lidarr
-  lidarr:
-    image: lscr.io/linuxserver/lidarr:latest
-    container_name: lidarr
-    environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=${TZ}
-    volumes:
-      - ${HOME_CONFIGS_DIR}/lidarr/config:/config
-      - ${HOME_CONFIGS_DIR}/lidarr/music:/music
-      - ${HOME_CONFIGS_DIR}/lidarr/downloads:/downloads
+
+#Audiobookshelf
+  audiobookshelf:
+    container_name: audiobookshelf
+    image: ghcr.io/advplyr/audiobookshelf:latest
     ports:
-      - 8089:8686
+      - 8089:80
+    volumes:
+      - ${DATA_DIR}/audiobookshelf/audiobooks:/audiobooks
+      - ${DATA_DIR}/audiobookshelf/podcasts>:/podcasts
+      - ${HOME_CONFIGS_DIR}/audiobookshelf/config>:/config
+      - ${DATA_DIR}/audiobookshelf/metadata>:/metadata
+    environment:
+      - TZ=${TZ}
     restart: unless-stopped
     networks:
       - interconnection
-#FileBrowser
-  filebrowser:
-    container_name: filebrowser
-    image: filebrowser/filebrowser:s6
-    environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=${TZ}
-    ports:
-      - 8090:80
-    volumes:
-      - ${HOME_CONFIGS_DIR}/filebrowser/config/settings.json:/config/settings.json
-      - ${HOME_CONFIGS_DIR}/filebrowser/database/filebrowser.db:/database/filebrowser.db
-      - ${DATA_DIR}:/srv
-    restart: unless-stopped
-    networks:
-      - interconnection
+
 #Dashy
   dashy:
     container_name: dashy
@@ -240,20 +218,133 @@ services:
     restart: unless-stopped
     volumes:
       - ${HOME_CONFIGS_DIR}/upsnap/data:/app/pb_data
-    # # To use a non-root user, create the mountpoint first (mkdir data) so that it has the right permission.
-    # user: 1000:1000
     ports:
       - 8093:8093
     environment:
       - TZ=${TZ}
-    # dns is used for name resolution during network scan
-    # dns:
-    #   - 192.18.0.1
-    #   - 192.18.0.2
-    # # you can change the listen ip:port inside the container like this:
+      - UPSNAP_HTTP_LISTEN=0.0.0.0:8093
     entrypoint: /bin/sh -c "./upsnap serve --http 0.0.0.0:8093"
-    healthcheck:
-      test: curl -fs "http://localhost:8093/api/health" || exit 1
-      interval: 10s
-    # # or install custom packages for shutdown
-    # entrypoint: /bin/sh -c "apk update && apk add --no-cache <YOUR_PACKAGE> && rm -rf /var/cache/apk/* && ./upsnap serve --http 0.0.0.0:8090"
+#FileBrowser
+  filebrowser:
+    container_name: filebrowser
+    image: filebrowser/filebrowser:s6
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=${TZ}
+    ports:
+      - 8094:80
+    volumes:
+      - ${HOME_CONFIGS_DIR}/filebrowser/config/settings.json:/config/settings.json
+      - ${HOME_CONFIGS_DIR}/filebrowser/database/filebrowser.db:/database/filebrowser.db
+      - ${DATA_DIR}:/srv
+    restart: unless-stopped
+    networks:
+      - interconnection
+
+# Grafana Stack
+  grafana-pdc-agent:
+    container_name: grafana-pdc-agent
+    image: grafana/pdc-agent:latest
+    command: >
+      -token ${PDC_AGENT_TOKEN} -cluster ${PDC_AGENT_CLUSTER} -gcloud-hosted-grafana-id ${PDC_AGENT_GRAFANA_ID}
+    restart: unless-stopped
+    networks:
+      - interconnection
+  grafana:
+    container_name: grafana
+    image: grafana/grafana-enterprise
+    user: "1000"
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=${TZ}
+      - GF_INSTALL_PLUGINS=grafana-clock-panel
+      - GF_PATHS_PROVISIONING=/etc/grafana/provisioning
+    ports:
+      - 9001:3000
+    volumes:
+      - ${HOME_CONFIGS_DIR}/grafana:/var/lib/grafana
+      - ${HOME_CONFIGS_DIR}/grafana/provisioning:/etc/grafana/provisioning
+    restart: unless-stopped
+    networks:
+      - interconnection
+  prometheus:
+    container_name: prometheus
+    image: prom/prometheus
+    user: root
+    ports:
+      - 9002:9090
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --web.console.libraries=/usr/share/prometheus/console_libraries
+      - --web.console.templates=/usr/share/prometheus/consoles
+      - --storage.tsdb.retention.time=7d
+    volumes:
+      - ${HOME_CONFIGS_DIR}/prometheus:/etc/prometheus
+      - ${HOME_DATA_DIR}/prometheus/data:/prometheus
+    restart: unless-stopped
+    networks:
+      - interconnection
+  loki:
+    container_name: loki
+    image: grafana/loki:latest
+    user: "1000"
+    ports:
+      - 9003:3100
+    command: -config.file=/etc/loki/loki-config.yml
+    volumes:
+      - ${HOME_CONFIGS_DIR}/loki:/etc/loki
+    restart: unless-stopped
+    networks:
+      - interconnection
+  promtail:
+    container_name: promtail
+    image: grafana/promtail:3.4.2
+    command: 
+      - --config.file=/etc/promtail/promtail-config.yml
+      - --config.expand-env=true
+    user: root
+    volumes:
+      - /var/log:/var/log
+      - ${HOME_CONFIGS_DIR}/promtail:/etc/promtail
+    restart: unless-stopped
+    networks:
+      - interconnection
+  node-exporter:
+    container_name: node-exporter
+    image: prom/node-exporter:latest
+    ports:
+      - 9004:9100
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+      - node-exporter-textfile:/var/lib/node_exporter/textfile_collector
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.rootfs=/rootfs'
+      - '--path.sysfs=/host/sys'
+      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
+      - '--collector.textfile.directory=/var/lib/node_exporter/textfile_collector'
+    restart: unless-stopped
+    networks:
+      - interconnection
+  top-metrics-exporter:
+    container_name: top-metrics-exporter
+    image: alpine:latest
+    pid: host
+    volumes:
+      - node-exporter-textfile:/var/lib/node_exporter/textfile_collector
+      - ${HOME_CONFIGS_DIR}/node-exporter/top-metrics.sh:/top-metrics.sh:ro
+    command: sh -c "apk add --no-cache procps && while true; do sh /top-metrics.sh; sleep 30; done"
+    restart: unless-stopped
+    networks:
+      - interconnection
+    depends_on:
+      - node-exporter
+
+volumes:
+  node-exporter-textfile:
+    driver: local
