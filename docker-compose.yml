@@ -111,6 +111,7 @@ services:
     volumes:
       - ${HOME_CONFIGS_DIR}/portainer/data:/data
       - /var/run/docker.sock:/var/run/docker.sock
+      - /run/user/1000/podman/podman.sock:/var/run/podman.sock
     restart: unless-stopped
     networks:
       - interconnection
@@ -241,13 +242,6 @@ services:
     restart: unless-stopped
     networks:
       - interconnection
-  whatsupdocker:
-    image: getwud/wud
-    container_name: wud
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-    ports:
-      - 8095:3000
 
 # Grafana Stack
   grafana-pdc-agent:
