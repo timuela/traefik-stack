@@ -91,6 +91,7 @@ services:
       - ${DATA_DIR}/TVSeries:/data/tvshows
       - ${DATA_DIR}/Movies:/data/movies
       - ${DATA_DIR}/Audios:/data/audios
+      - ${DATA_DIR}/audiobookshelf/audiobooks:/data/audios/Audiobooks
     networks:
       - interconnection
 #Flaresolverr
